@@ -1,0 +1,15 @@
+#!/bin/bash
+
+sites=( keithieopia )
+
+for site in "${sites[@]}"; do
+	id=$(docker images | grep $site | awk '{print $3}')
+
+	if ! docker inspect -f "{{.NetworkSettings.IPAddress}}" $id 2>/dev/null; then
+		ip="offline"
+	else
+		ip=$(docker inspect -f "{{.NetworkSettings.IPAddress}}" $id)
+	fi
+	
+	echo -e "$site\t$id\t$ip"
+done | sed '1iNAME\tID\tIP' | column -ts $'\t'
